@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local Business Finder</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+  <div class="bg-white p-10 rounded-lg shadow-lg">
+    <h1 class="text-2xl mb-4">Find Local Businesses</h1>
+    <input id="search" class="border p-2 rounded w-full mb-4" placeholder="e.g., restaurants in Bangalore" />
+    <button onclick="searchPlaces()" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+    <div id="results" class="mt-4"></div>
+  </div>
+  <script>
+    async function searchPlaces() {
+      const query = document.getElementById('search').value;
+      const res = await fetch('/api/search-places', {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+      if(data.results){
+        data.results.forEach((place, i) => {
+          const btn = `<button onclick="analyze('${encodeURIComponent(place.name)}')" class="ml-2 bg-green-500 text-white px-2 py-1 rounded">Analyze</button>`;
+          resultsDiv.innerHTML += `<div class="mb-2 p-2 border rounded">${place.name}${btn}</div>`;
+        });
+      } else {
+        resultsDiv.innerHTML = "No results.";
+      }
+    }
+
+    function analyze(business) {
+      window.location.href = `/results.html?business=${business}`;
+    }
+  </script>
+</body>
+</html>
